@@ -6,8 +6,8 @@ import com.scott.userservice.exception.RequestException;
 import com.scott.userservice.exception.ValidationException;
 import com.scott.userservice.model.Person;
 import com.scott.userservice.utils.RestUtils;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -24,12 +24,13 @@ import java.util.Set;
 
 @RestController
 @Validated
+@AllArgsConstructor
 public class PersonController {
-    @Autowired
+
     PersonRepository personRepository;
 
-    @Autowired
-    private Validator validator;
+
+    private final Validator validator;
     @GetMapping("/person/{id}")
     public ResponseEntity<Person> getPersonById(@PathVariable("id") @Min(value =0) long id) {
         return new ResponseEntity<>(personRepository.findById(id).orElseThrow(() -> new NotFoundException("User not found")), HttpStatus.OK);
