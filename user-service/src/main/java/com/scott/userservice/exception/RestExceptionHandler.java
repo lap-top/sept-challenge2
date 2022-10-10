@@ -3,16 +3,17 @@ package com.scott.userservice.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.converter.HttpMessageNotReadableException;
-import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import java.io.IOException;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
-@ControllerAdvice
+@RestControllerAdvice
 public class RestExceptionHandler {
+
+    public RestExceptionHandler() {
+    }
 
     @ExceptionHandler(value = {RequestException.class})
     public ResponseEntity<Object> handleRequestException(RequestException e) {
@@ -34,16 +35,5 @@ public class RestExceptionHandler {
                 e
         );
         return new ResponseEntity<>(exception, HttpStatus.NOT_FOUND);
-    }
-
-    @ExceptionHandler(HttpMessageNotReadableException.class)
-    public ResponseEntity<Object> handleException(HttpMessageNotReadableException e) throws IOException {
-        RestException exception = new RestException(
-                e.getLocalizedMessage(),
-                HttpStatus.BAD_REQUEST,
-                ZonedDateTime.now(ZoneId.of("Z")),
-                e
-        );
-        return new ResponseEntity<>(exception, HttpStatus.BAD_REQUEST);
     }
 }
