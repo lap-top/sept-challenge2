@@ -12,12 +12,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.HttpServerErrorException;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Valid;
 import javax.validation.Validator;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
+import java.util.List;
 import java.util.Set;
 
 @RestController
@@ -33,6 +35,17 @@ public class PersonController {
         return new ResponseEntity<>(personRepository.findById(id).orElseThrow(() -> new NotFoundException("User not found")), HttpStatus.OK);
     }
 
+    @GetMapping("/persons/person")
+    public ResponseEntity<List<Person>> getAllPeople() {
+        try {
+            return new ResponseEntity<>(personRepository.findAll(), HttpStatus.OK);
+        } catch(Exception e) {
+            throw new HttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+    }
+
+
     @PostMapping("/person")
     public ResponseEntity<Person> newPerson(@RequestBody @Valid Person person) {
         if (personRepository.findByEmail(person.getEmail()) != null)
@@ -42,11 +55,12 @@ public class PersonController {
     }
 
     @PutMapping("/persons/person")
-    public ResponseEntity<Person> updatePerson(@NotNull @RequestBody Person person) throws RequestException, ValidationException {
+    public ResponseEntity<Person> updatePersonById(@NotNull @RequestBody Person person) throws RequestException, ValidationException {
         if (person.getId() == null)
             throw new RequestException("User id must be in request body");
-        BeanUtils.copyProperties(person, existingPerson, RestUtils.nullProperties(person));
-        Set<ConstraintViolation<Person>> violations = validator.validate(existingPerson);
+        Person existingPerson = personRepository.findById(person.getId()).orElseThrow(() -> new NotFoundException("User not found"));
+        BeanUtils.copyProperties(person, existingPerson, RestUtils.nullProperties(person)); // Only replaces values which contain values
+        Set<ConstraintViolation<Person>> violations = validator.validate(existingPerson); // validate if new person conforms to constraints
 
         if (violations.size() > 0){
             throw new ValidationException(violations);
@@ -54,4 +68,6 @@ public class PersonController {
 
         return new ResponseEntity<>(personRepository.save(existingPerson), HttpStatus.OK);
     }
+
+
 }
