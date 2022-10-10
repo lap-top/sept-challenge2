@@ -27,7 +27,7 @@ import java.util.Set;
 @AllArgsConstructor
 public class PersonController {
 
-    PersonRepository personRepository;
+    private final PersonRepository personRepository;
 
 
     private final Validator validator;
