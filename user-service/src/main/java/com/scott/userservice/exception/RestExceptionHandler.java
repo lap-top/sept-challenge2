@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.client.HttpServerErrorException;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -52,4 +53,18 @@ public class RestExceptionHandler {
         );
         return new ResponseEntity<>(exception, HttpStatus.NOT_FOUND);
     }
+
+    @ExceptionHandler(value = {HttpServerErrorException.class})
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ResponseEntity<Object> handleInternalServerError(HttpServerErrorException e) {
+        RestException exception = new RestException(
+                e.getMessage(),
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                ZonedDateTime.now(ZoneId.of("Z")),
+                e
+        );
+        return new ResponseEntity<>(exception, HttpStatus.NOT_FOUND);
+    }
+
+
 }
