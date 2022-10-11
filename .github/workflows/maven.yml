@@ -18,13 +18,13 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-    steps:
-    - uses: shogo82148/actions-setup-mysql@v1
-    - name: Set up MYSQL Build Database
-      with:
-        mysql-version: '8.0'
-        
+    steps:  
     - uses: actions/checkout@v3
+    - name: Test environment for MySQL
+      uses: jordiprats/mysql-action@1.1
+      with:
+        mysql version: 8
+        mysql root password: SPESM1234   
     - name: Set up JDK 18
       uses: actions/setup-java@v3
       with:
