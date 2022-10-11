@@ -1,0 +1,27 @@
+version: "3"
+services:
+  account-service:
+    build: .
+    ports:
+      - "8081:8081"
+    depends_on:
+      - mysqldb
+
+  mysqldb:
+    image: mysql:8
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    hostname: mysqldb
+
+    ports:
+      - "3036:3036"
+    expose:
+      - "3306"
+    volumes:
+      - my-db:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=sept
+
+volumes:
+  my-db:
