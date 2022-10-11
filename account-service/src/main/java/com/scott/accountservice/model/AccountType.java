@@ -1,15 +1,28 @@
 package com.scott.accountservice.model;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import javax.persistence.*;
+import java.util.Set;
 
 @Entity
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
 public class AccountType {
+    AccountType(Long id) {
+        this.type = id;
+    }
     @Id
     @GeneratedValue(strategy= GenerationType.AUTO)
-    private Integer accountNumber;
-    private String accountName;
+    private Long type;
+    private String name;
+
+
+
 
 }
