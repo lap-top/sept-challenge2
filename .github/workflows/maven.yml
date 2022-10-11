@@ -19,11 +19,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:  
-    - name: Test environment for MySQL
-      uses: jordiprats/mysql-action@1.1
+    - name: Setup MySQL
+      uses: mirromutth/mysql-action@v1.1
       with:
         mysql version: 8
-        mysql root password: SPESM1234 
+        mysql root password: SPESM1234
+        mysql database: sept
         
     - uses: actions/checkout@v3  
     - name: Set up JDK 18
