@@ -1,5 +1,6 @@
 package com.scott.accountservice.model;
 
+import com.scott.accountservice.dao.AccountRepository;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,15 +14,20 @@ import javax.persistence.*;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Account {
+
     @Id
-    @GeneratedValue(strategy= GenerationType.AUTO)
+    @GeneratedValue(strategy= GenerationType.IDENTITY)
     private Long accountNumber;
-    @Transient
-    private String accountName;
-    @Transient
+
+    @JoinColumn(name = "person_id")
     private Long id;
+
+    private String accountName;
+
     @ManyToOne
+    @JoinColumn(name="accountType_type", nullable=false)
     private AccountType accountType;
-    private double balance;
+
+    private double balance = 0;
 
 }
