@@ -29,10 +29,9 @@ public class PersonController {
 
     private final PersonRepository personRepository;
 
-
     private final Validator validator;
     @GetMapping("/person/{id}")
-    public ResponseEntity<Person> getPersonById(@PathVariable("id") @Min(value =0) long id) {
+    public ResponseEntity<Person>   getPersonById(@PathVariable("id") @Min(value =0) long id) {
         return new ResponseEntity<>(personRepository.findById(id).orElseThrow(() -> new NotFoundException("User not found")), HttpStatus.OK);
     }
 
@@ -70,5 +69,12 @@ public class PersonController {
         return new ResponseEntity<>(personRepository.save(existingPerson), HttpStatus.OK);
     }
 
+    @DeleteMapping("/persons/person")
+    public ResponseEntity<Person> deletePerson( @RequestBody Person person) {
+        person = personRepository.findById(person.getId()).orElseThrow(() -> new NotFoundException("User not found"));
+        personRepository.delete(person);
+        return new ResponseEntity<>(person, HttpStatus.OK);
+
+    }
 
 }
