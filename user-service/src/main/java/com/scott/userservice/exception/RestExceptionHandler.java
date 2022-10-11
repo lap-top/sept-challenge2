@@ -1,19 +1,28 @@
 package com.scott.userservice.exception;
 
 
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.client.HttpServerErrorException;
+import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.stream.Collectors;
 
-@RestControllerAdvice
-public class RestExceptionHandler {
+@ControllerAdvice
+@Order(Ordered.HIGHEST_PRECEDENCE)
+public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     public RestExceptionHandler() {
     }
@@ -66,5 +75,40 @@ public class RestExceptionHandler {
         return new ResponseEntity<>(exception, HttpStatus.NOT_FOUND);
     }
 
+    @Override
+    protected ResponseEntity<Object> handleMethodArgumentNotValid(
+            MethodArgumentNotValidException ex,
+            HttpHeaders headers,
+            HttpStatus status,
+            WebRequest request) {
+        RestException exception = new RestException(
+                "["+ex.getAllErrors().stream().map(val -> "'"+val.getDefaultMessage()+"'").collect(Collectors.joining(", "))+"]",
+                HttpStatus.BAD_REQUEST,
+                ZonedDateTime.now(ZoneId.of("Z")),
+                ex
+        );
+        return new ResponseEntity<>(exception, HttpStatus.BAD_REQUEST);
+    }
 
+    @Override
+    protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+        RestException exception = new RestException(
+                ex.getLocalizedMessage(),
+                HttpStatus.BAD_REQUEST,
+                ZonedDateTime.now(ZoneId.of("Z")),
+                ex
+        );
+        return new ResponseEntity<>(exception, HttpStatus.BAD_REQUEST);
+    }
+
+    @Override
+    protected ResponseEntity<Object> handleHttpRequestMethodNotSupported(HttpRequestMethodNotSupportedException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+        RestException exception = new RestException(
+                ex.getLocalizedMessage(),
+                HttpStatus.METHOD_NOT_ALLOWED,
+                ZonedDateTime.now(ZoneId.of("Z")),
+                ex
+        );
+        return new ResponseEntity<>(exception, HttpStatus.METHOD_NOT_ALLOWED);
+    }
 }
